@@ -10,14 +10,14 @@ import math
 ROUND_PRECISION = 5
 x = Symbol('x')
 iteration = 0
-iteration_limit = 100000
+iteration_limit = 2
 
 
 class ZeroOfAFunction:
     """ Implementation of function that finds the zero of a real function"""
 
     def __init__(self, function, interval: List[float], precision: List[float],
-                 method: str):
+                 method: str, initial_guess=0.5):
         self.precision = precision
         if len(precision) != 0:
             self.single_precision = True
@@ -25,9 +25,11 @@ class ZeroOfAFunction:
             self.single_precision = False
         self.interval = interval
         self.method = method
-        self.initial_guess = random.randint(interval[0], interval[1])
+        #self.initial_guess = random.randint(interval[0], interval[1])
+        self.initial_guess = initial_guess
         self.function = lambdify(x, function)
         self.derivative_function = lambdify(x, function.diff(x))
+        self.string_derivative_function = function.diff(x)
 
     def f(self, x_):
         return self.function(x_)
@@ -38,11 +40,13 @@ class ZeroOfAFunction:
     def do_magick(self):
         if self.method == 'bisection':
             return self.bisection_method()
+        elif self.method == 'newton_raphson':
+            return self.newton_raphson_method(self.initial_guess)
         else:
             raise NotImplementedError
 
     def plot_graph(self):
-        x_ = np.linspace(0, 10, 100)
+        x_ = np.linspace(-10, 5, 100)
         plt.plot(x_, self.f(x_), label='value')
         plt.show()
 
@@ -75,10 +79,31 @@ class ZeroOfAFunction:
 
             iteration += 1
 
+    def newton_raphson_method(self, x) -> float:
+        global iteration
+        x = round(x - self.f(x) / self.f_(x), ROUND_PRECISION)
+        print(
+            "k = " + str(iteration) + " | x" + str(iteration) + " = " + str(x) + " | f(" + str(
+                x) + ") = " + str(self.f(x)))
+        # if self.f(x) < E:
+        #     return x
+        # Remember to change iteration limit
+        if iteration == iteration_limit:
+            return x
+        iteration += 1
+
+        return self.newton_raphson_method(x)
+
 
 if __name__ == '__main__':
-    #function = (cos(x) * -1) + (E ** (x * -2))
-    function = x * ln(x) - 3.2
-    solver = ZeroOfAFunction(function=function, interval=[2, 3],
-                             precision=[0.0001], method='bisection')
+    # function = (cos(x) * -1) + (E ** (x * -2))
+    # function = x * ln(x) - 3.2
+    # function = sqrt(x) - (E ** (x * -1))
+    function = (x ** 4) - (2 * x ** 3) + (4 * x) - 1.6
+    solver = ZeroOfAFunction(function=function, interval=[0, 1],
+                             precision=[0.00000001], method='newton_raphson')
+    # solver.plot_graph()
+
+    print(f'f(x): {function}')
+    print(f"f'(x): {solver.string_derivative_function}")
     print(solver.do_magick())
