@@ -2,6 +2,7 @@ import random
 from typing import List
 
 from sympy import *
+import matplotlib.pyplot as plt
 import numpy as np
 import math
 
@@ -34,10 +35,16 @@ class ZeroOfAFunction:
         return self.derivative_function(x_)
 
     def do_magick(self):
+        self.plot_graph()
         if self.method == 'bisection':
             return self.bisection_method()
         else:
             raise NotImplementedError
+
+    def plot_graph(self):
+        x_ = np.linspace(0, 10, 100)
+        plt.plot(x_, self.f(x_), label='value')
+        plt.show()
 
     @staticmethod
     def is_positive(number):
@@ -54,7 +61,8 @@ class ZeroOfAFunction:
             if abs(self.interval[1] - self.interval[0]) < self.precision[
                 0] or iteration > iteration_limit:
                 return x_
-            if self.is_positive(self.f(self.interval[0])) != self.is_positive(self.f(x_)):
+            if self.is_positive(self.f(self.interval[0])) != self.is_positive(
+                    self.f(x_)):
                 self.interval[1] = x_
                 self.interval[0] += 5 * self.precision[0]
             elif x_ >= self.interval[0]:
@@ -63,7 +71,7 @@ class ZeroOfAFunction:
 
 
 if __name__ == '__main__':
-    function = 2 * sin(x) ** 2 + 3
-    solver = ZeroOfAFunction(function=function, interval=[0, 2],
-                             precision=[0.00000001], method='bisection')
+    function = (cos(x) * -1) + (E ** (x * -2))
+    solver = ZeroOfAFunction(function=function, interval=[1, 2],
+                             precision=[0.0001], method='bisection')
     print(solver.do_magick())
