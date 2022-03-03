@@ -1,4 +1,5 @@
 import random
+from copy import deepcopy
 from typing import List
 
 from sympy import *
@@ -35,7 +36,6 @@ class ZeroOfAFunction:
         return self.derivative_function(x_)
 
     def do_magick(self):
-        self.plot_graph()
         if self.method == 'bisection':
             return self.bisection_method()
         else:
@@ -53,25 +53,32 @@ class ZeroOfAFunction:
     def bisection_method(self) -> float:
         global iteration, iteration_limit
         while True:
+            previous_interval = deepcopy(self.interval)
             x_ = round(np.mean(self.interval), ROUND_PRECISION)
             print(
                 f'iteration = {str(iteration)} | x{str(iteration)} = {str(x_)} | f({str(x_)}) = '
                 f'{str(self.f(x_))}'
             )
-            if abs(self.interval[1] - self.interval[0]) < self.precision[
-                0] or iteration > iteration_limit:
+            # print(f'interval [a={self.interval[0]}, b={self.interval[1]}]')
+            if abs(self.interval[1] - self.interval[0]) < self.precision[0]\
+                    or iteration > iteration_limit:
                 return x_
             if self.is_positive(self.f(self.interval[0])) != self.is_positive(
                     self.f(x_)):
                 self.interval[1] = x_
                 self.interval[0] += 5 * self.precision[0]
+
             elif x_ >= self.interval[0]:
                 self.interval[0] = x_
+            if previous_interval == self.interval:
+                return x_
+
             iteration += 1
 
 
 if __name__ == '__main__':
-    function = (cos(x) * -1) + (E ** (x * -2))
-    solver = ZeroOfAFunction(function=function, interval=[1, 2],
+    #function = (cos(x) * -1) + (E ** (x * -2))
+    function = x * ln(x) - 3.2
+    solver = ZeroOfAFunction(function=function, interval=[2, 3],
                              precision=[0.0001], method='bisection')
     print(solver.do_magick())
