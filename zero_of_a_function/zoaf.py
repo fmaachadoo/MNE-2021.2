@@ -25,7 +25,7 @@ class ZeroOfAFunction:
             self.single_precision = False
         self.interval = interval
         self.method = method
-        self.initial_guess = random.randint(10, 100)
+        self.initial_guess = random.randint(interval[0], interval[1])
         self.function = lambdify(x, function)
         self.derivative_function = lambdify(x, function.diff(x))
 
