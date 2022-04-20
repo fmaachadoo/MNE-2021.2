@@ -6,6 +6,10 @@ from sympy import *
 import csv
 import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.dates as dates
+from datetime import datetime
+import numpy as np
 import math
 
 ROUND_PRECISION = 5
@@ -21,7 +25,6 @@ class DataExtrapolation:
 
     def __init__(self, dataset_path):
         self.dataset = self.read_dataset(dataset_path)
-        import pdb;pdb.set_trace()
 
     @staticmethod
     def read_dataset(dataset_path):
@@ -33,6 +36,17 @@ class DataExtrapolation:
                     dataset[row[0]] = row[1]
         return dataset
 
+    def plot_dataset_graph(self):
+        x = [datetime.strptime(d, '%Y-%m').date() for d in self.dataset.keys()]
+        y = [int(v) for v in self.dataset.values()]
+        plt.gca().xaxis.set_major_formatter(dates.DateFormatter('%Y-%m'))
+        plt.gca().xaxis.set_major_locator(dates.DayLocator(interval=32))
+        plt.plot(x, y, label='value')
+        plt.gcf().autofmt_xdate()
+        plt.xlabel(u"Chegada de turistas no brasil por mês")
+        plt.ylabel(u"Data no formato Ano-mês")
+        plt.show()
+
     @staticmethod
     def is_positive(number):
         return True if number >= 0 else False
@@ -40,4 +54,5 @@ class DataExtrapolation:
 
 if __name__ == '__main__':
     tourists = DataExtrapolation(dataset_path=TOURISTS_ARRIVAL_BY_MONTH_CSV_PATH)
+    tourists.plot_dataset_graph()
     # tourists.plot_graph()
